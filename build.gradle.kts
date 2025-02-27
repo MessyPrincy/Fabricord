@@ -34,7 +34,7 @@ dependencies {
 	}
 	modApi("org.yaml:snakeyaml:2.3")
 	modApi("net.kyori:adventure-text-serializer-gson:4.17.0")
-	modApi("net.ririfa:langman:1.4.2")
+	modApi("net.ririfa:langman:1.4.3")
 
 	modCompileOnly("org.apache.logging.log4j:log4j-api:+")
 	modCompileOnly("org.apache.logging.log4j:log4j-core:+")
@@ -44,7 +44,7 @@ dependencies {
 	}
 	includeInJar("org.yaml:snakeyaml:2.3")
 	includeInJar("net.kyori:adventure-text-serializer-gson:4.17.0")
-	includeInJar("net.ririfa:langman:1.4.2")
+	includeInJar("net.ririfa:langman:1.4.3")
 }
 
 val targetJavaVersion = 21

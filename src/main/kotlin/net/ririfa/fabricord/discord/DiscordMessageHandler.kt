@@ -7,6 +7,7 @@ import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
+import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 import net.minecraft.text.TextColor
 import net.ririfa.fabricord.Config
@@ -77,42 +78,74 @@ object DiscordMessageHandler {
 		val roleColor = highestRole?.color ?: Color.WHITE
 		val roleTextColor = TextColor.fromRgb((roleColor.red shl 16) or (roleColor.green shl 8) or roleColor.blue)
 
-		val discordText = Text.literal("Discord")
+		var discordText = Text.literal("Discord")
 			.styled {
 				it.withColor(0x55CDFC)
-					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(guildName))) }
+					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(guildName)))
+					.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.com/channels/${event.guild.id}/${event.channel.id}"))
+			}
 
-		val roleText = roleName?.let {
-			Text.literal(" | $it")
-				.styled {
-					it.withColor(roleTextColor)
-						.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(rId)))
-						.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, rIdSuggest))
-				}
-		} ?: Text.literal("")
+		if (roleName != null) {
+			discordText.append(
+				Text.literal(" | $roleName")
+					.styled {
+						it.withColor(roleTextColor)
+							.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $rId")))
+							.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, rIdSuggest))
+					}
+			)
+		}
 
 		val memberText = Text.literal(" $memberName")
 			.styled {
 				it.withColor(0x55CDFC)
-					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(memberId)))
+					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $memberId")))
 					.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, idSuggest))
 			}
 
 		val messageContent = updatedContent ?: event.message.contentDisplay
-		val messageText = if (isMention) {
-			Text.literal(" » $messageContent").styled { it.withBold(true) }
-		} else {
-			Text.literal(" » $messageContent")
-		}
+		val messageText = parseMessageWithLinks(messageContent, isMention)
 
 		return Text.empty()
 			.append(Text.literal("[").styled { it.withColor(0xFFFFFF) })
 			.append(discordText)
-			.append(Text.of(" | "))
-			.append(roleText)
 			.append(Text.literal("] ").styled { it.withColor(0xFFFFFF) })
 			.append(memberText)
 			.append(messageText)
+	}
+
+	private fun parseMessageWithLinks(message: String, isMention: Boolean): Text {
+		val urlRegex = Regex("(https?://[\\w\\-._~:/?#\\[\\]@!$&'()*+,;=]+)")
+		val text = Text.empty()
+
+		var lastIndex = 0
+		for (match in urlRegex.findAll(message)) {
+			val url = match.value
+			val startIndex = match.range.first
+
+			if (lastIndex < startIndex) {
+				text.append(Text.literal(message.substring(lastIndex, startIndex)))
+			}
+
+			val displayUrl = if (url.length > 30) url.take(30) + "…" else url
+
+			val clickableUrl = Text.literal(displayUrl)
+				.styled {
+					it.withColor(0x0080FF)
+						.withUnderline(true)
+						.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, url))
+						.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(url)))
+				}
+
+			text.append(clickableUrl)
+			lastIndex = match.range.last + 1
+		}
+
+		if (lastIndex < message.length) {
+			text.append(Text.literal(message.substring(lastIndex)))
+		}
+
+		return if (isMention) text.styled { it.withBold(true) } else text
 	}
 
 }
