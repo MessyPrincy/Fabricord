@@ -185,5 +185,9 @@ object ConfigManager {
 			if (enableConsoleLog == null) enableConsoleLog = true
 			if (consoleLogChannelID.isNullOrBlank()) consoleLogChannelID = "0"
 		}
+
+		fun getFile(): Path {
+			return configFile
+		}
 	}
 }

@@ -47,6 +47,10 @@ dependencies {
 	includeInJar("net.ririfa:langman:1.4.3")
 }
 
+loom {
+	accessWidenerPath = file("src/main/resources/fabricord.accesswidener")
+}
+
 val targetJavaVersion = 21
 
 java {

@@ -29,6 +29,19 @@ Discord:
 
     CannotLoginToBot: "Login error: Unable to connect to the bot."
 
+  Embed:
+    PlayerList:
+      Title: "Online Players"
+      Description: "There are currently %s players online.\n\n"
+
+      ThereAreNoPlayersOnline: "There are no players online at the moment."
+
+    ServerStatus:
+      Title: "Server Status"
+
+      Description:
+        MemoryUsage: "Memory Usage"
+
 Exception:
   Config:
     RequiredPropertyIsNotConfigured: "The required property (%s) is not configured in the settings file (%s)."

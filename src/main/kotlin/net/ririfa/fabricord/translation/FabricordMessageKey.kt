@@ -41,6 +41,22 @@ sealed class FabricordMessageKey : MessageKey<FabricordMessageProvider, Text> {
 
 			object CannotLoginToBot : Bot()
 		}
+
+		sealed class Embed : Discord() {
+			sealed class PlayerList : Embed() {
+				object Title : PlayerList()
+				object Description : PlayerList()
+
+				object ThereAreNoPlayersOnline : PlayerList()
+			}
+
+			sealed class ServerStatus : Embed() {
+				object Title : ServerStatus()
+				sealed class Description : ServerStatus() {
+					object MemoryUsage : Description()
+				}
+			}
+		}
 	}
 
 	sealed class Exception : FabricordMessageKey() {

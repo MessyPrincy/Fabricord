@@ -1,15 +1,10 @@
 package net.ririfa.fabricord.discord
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.minecraft.server.MinecraftServer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundCategory
 import net.minecraft.sound.SoundEvents
-import net.minecraft.text.ClickEvent
-import net.minecraft.text.HoverEvent
-import net.minecraft.text.MutableText
-import net.minecraft.text.Text
-import net.minecraft.text.TextColor
+import net.minecraft.text.*
 import net.ririfa.fabricord.Config
 import net.ririfa.fabricord.FT
 import net.ririfa.fabricord.Server
@@ -19,8 +14,8 @@ import java.awt.Color
 object DiscordMessageHandler {
 	fun handleDiscordMessage(event: MessageReceivedEvent) {
 		FT {
-			val message: Text = createMessage(event, false, null) ?: return@FT
-			sendToAllPlayers(Server, message)
+			val message: MutableText = createMessage(event, false, null) ?: return@FT
+			sendToAllPlayers(message)
 		}
 	}
 
@@ -42,32 +37,32 @@ object DiscordMessageHandler {
 			}
 
 			val nonMentionedPlayers = if (foundUUID) updatedMessageContent.second else mentionedPlayers
-			sendToAllPlayersExcept(Server, generalMessage, nonMentionedPlayers)
+			sendToAllPlayersExcept(generalMessage, nonMentionedPlayers)
 		}
 	}
 
-	private fun sendToAllPlayers(server: MinecraftServer, message: Text) {
-		server.playerManager.playerList.forEach { player ->
+	private fun sendToAllPlayers(message: Text) {
+		Server.playerManager.playerList.forEach { player ->
 			player.sendMessage(message, false)
 		}
 	}
 
-	private fun sendToAllPlayersExcept(server: MinecraftServer, message: Text, excludePlayers: List<ServerPlayerEntity>) {
-		server.playerManager.playerList.forEach { player ->
+	private fun sendToAllPlayersExcept(message: Text, excludePlayers: List<ServerPlayerEntity>) {
+		Server.playerManager.playerList.forEach { player ->
 			if (player !in excludePlayers) {
 				player.sendMessage(message, false)
 			}
 		}
 	}
 
-	private fun createMessage(event: MessageReceivedEvent, isMention: Boolean, updatedContent: String?): Text? {
+	private fun createMessage(event: MessageReceivedEvent, isMention: Boolean, updatedContent: String?): MutableText? {
 		val channelId: String = Config.logChannelID
 		if (event.channel.id != channelId || event.author.isBot) {
 			return null
 		}
 
 		val guildName = event.guild.name
-		val member = event.guild.getMember(event.author)
+		val member = event.member
 		val memberName = member?.effectiveName ?: member?.user?.globalName ?: member?.user?.name ?: "Unknown"
 		val memberId = member?.user?.id ?: "00000000000000000000"
 		val idSuggest = "<@$memberId>"
@@ -78,27 +73,25 @@ object DiscordMessageHandler {
 		val roleColor = highestRole?.color ?: Color.WHITE
 		val roleTextColor = TextColor.fromRgb((roleColor.red shl 16) or (roleColor.green shl 8) or roleColor.blue)
 
-		var discordText = Text.literal("Discord")
+		val discordText = Text.literal("Discord")
 			.styled {
 				it.withColor(0x55CDFC)
 					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(guildName)))
 					.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, "https://discord.com/channels/${event.guild.id}/${event.channel.id}"))
 			}
 
-		if (roleName != null) {
-			discordText.append(
-				Text.literal(" | $roleName")
-					.styled {
-						it.withColor(roleTextColor)
-							.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $rId")))
-							.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, rIdSuggest))
-					}
-			)
+		val roleText = roleName?.let {
+			Text.literal(it)
+				.styled {
+					it.withColor(roleTextColor)
+						.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $rId")))
+						.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, rIdSuggest))
+				}
 		}
 
-		val memberText = Text.literal(" $memberName")
+		val memberText = Text.literal(memberName)
 			.styled {
-				it.withColor(0x55CDFC)
+				it.withColor(0xFFFFFF)
 					.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of("ID: $memberId")))
 					.withClickEvent(ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, idSuggest))
 			}
@@ -106,12 +99,20 @@ object DiscordMessageHandler {
 		val messageContent = updatedContent ?: event.message.contentDisplay
 		val messageText = parseMessageWithLinks(messageContent, isMention)
 
-		return Text.empty()
-			.append(Text.literal("[").styled { it.withColor(0xFFFFFF) })
+		val text = Text.literal("[").styled { it.withColor(0xFFFFFF) }
 			.append(discordText)
-			.append(Text.literal("] ").styled { it.withColor(0xFFFFFF) })
+
+		if (roleText != null) {
+			text.append(Text.literal(" | ").styled { it.withColor(0xFFFFFF) })
+			text.append(roleText)
+		}
+
+		text.append(Text.literal("] ").styled { it.withColor(0xFFFFFF) })
 			.append(memberText)
+			.append(Text.literal(" » ").styled { it.withColor(0xFFFFFF) })
 			.append(messageText)
+
+		return text
 	}
 
 	private fun parseMessageWithLinks(message: String, isMention: Boolean): Text {
@@ -131,7 +132,7 @@ object DiscordMessageHandler {
 
 			val clickableUrl = Text.literal(displayUrl)
 				.styled {
-					it.withColor(0x0080FF)
+					it.withColor(0x55CDFC)
 						.withUnderline(true)
 						.withClickEvent(ClickEvent(ClickEvent.Action.OPEN_URL, url))
 						.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.of(url)))

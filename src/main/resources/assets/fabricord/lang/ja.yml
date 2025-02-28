@@ -29,6 +29,19 @@ Discord:
 
     CannotLoginToBot: "ログインエラーにより、Botに接続できません。"
 
+  Embed:
+    PlayerList:
+      Title: "オンラインのプレイヤー"
+      Description: "現在、%s人のプレイヤーがオンラインです。\n\n"
+
+      ThereAreNoPlayersOnline: "現在、オンラインのプレイヤーはいません。"
+
+    ServerStatus:
+      Title: "サーバーステータス"
+
+      Description:
+        MemoryUsage: "メモリ使用量"
+
 Exception:
   Config:
     RequiredPropertyIsNotConfigured: "設定ファイル (%s) に必要なプロパティ(%s)が設定されていません。"

@@ -30,5 +30,6 @@
 		"java": ">=21",
 		"fabric-api": "*",
 		"fabric-language-kotlin": ">=1.13.0+kotlin.2.1.0"
-	}
+	},
+	"accessWidener": "fabricord.accesswidener"
 }

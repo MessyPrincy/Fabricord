@@ -4,7 +4,11 @@
 A modern message style like DiscordSRV will be reproduced as a Fabric version mod.
 
 ![CodeFactor](https://www.codefactor.io/repository/github/ririf4/fabricord/badge)
-![GitHub License](https://img.shields.io/github/license/KT-Ruxy/Fabricord?style=plastic&logo=github&link=https%3A%2F%2Fgithub.com%2FKT-Ruxy%2FFabricord%2Fblob%2Fkotlin%2FLICENSE) ![GitHub release (with filter)](https://img.shields.io/github/v/release/Elysium-7/Fabricord?style=plastic) ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/t/Elysium-7/Fabricord?style=plastic)
+![GitHub License](https://img.shields.io/github/license/KT-Ruxy/Fabricord?style=plastic&logo=github&link=https%3A%2F%2Fgithub.com%2FKT-Ruxy%2FFabricord%2Fblob%2Fkotlin%2FLICENSE)
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.modrinth.com%2Fv2%2Fproject%2FxU8Bn98V%2Fversion&query=%24%5B0%5D.version_number&style=plastic&logo=Modrinth&label=Latest%20Version&color=00af5c&link=https%3A%2F%2Fmodrinth.com%2Fmod%2Ffabricord%2Fversions)
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.modrinth.com%2Fv2%2Fproject%2FxU8Bn98V&query=%24.downloads&style=plastic&logo=Modrinth&label=Download&color=00af5c&link=https%3A%2F%2Fmodrinth.com%2Fmod%2Ffabricord%2Fversions)
+![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.modrinth.com%2Fv2%2Fproject%2FxU8Bn98V&query=%24.followers&style=plastic&logo=Modrinth&label=Follower&color=00af5c&link=https%3A%2F%2Fmodrinth.com%2Fmod%2Ffabricord%2Fversions)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/t/Elysium-7/Fabricord?style=plastic)
 
 ## Overview
 Fabricord is a mod of DiscordSRV for FabricServer that bridges Discord and FabricServer chats to each other for a better communication experience.

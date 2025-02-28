@@ -19,9 +19,30 @@ val Server: MinecraftServer by lazy { Fabricord.server }
 val Loader: FabricLoader = Fabricord.loader
 val ServerDir: Path = Fabricord.serverDir
 val ModDir: Path = Fabricord.modDir
-val ConfigDir: Path = ConfigManager.configFile
 val Config: ConfigManager.Config by lazy { ConfigManager.config }
 val T = Fabricord.thread
+
+@Suppress("FunctionName")
+inline fun <reified Q> FT(
+	delay: Long = 0,
+	period: Long = -1,
+	unit: TimeUnit = TimeUnit.MILLISECONDS,
+	newThread: Boolean = false,
+	argument: Q? = null,
+	crossinline task: (Q?) -> Unit
+) {
+	val executor = if (newThread) Executors.newSingleThreadScheduledExecutor() else T
+
+	if (period > 0) {
+		executor.scheduleAtFixedRate({ task(argument) }, delay, period, unit)
+	} else {
+		executor.schedule({ task(argument) }, delay, unit)
+	}
+
+	if (newThread && period <= 0) {
+		executor.shutdown()
+	}
+}
 
 @Suppress("FunctionName")
 inline fun FT(
@@ -31,15 +52,5 @@ inline fun FT(
 	newThread: Boolean = false,
 	crossinline task: () -> Unit
 ) {
-	val executor = if (newThread) Executors.newSingleThreadScheduledExecutor() else T
-
-	if (period > 0) {
-		executor.scheduleAtFixedRate({ task() }, delay, period, unit)
-	} else {
-		executor.schedule({ task() }, delay, unit)
-	}
-
-	if (newThread && period <= 0) {
-		executor.shutdown()
-	}
+	FT<Unit>(delay, period, unit, newThread, null) { task() }
 }
