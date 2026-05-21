@@ -311,9 +311,10 @@ object DiscordBotManager {
 	}
 
 	fun sendToDiscord(message: String) {
+		val sanitized = message.replace(Regex("<@[!&]?\\d+>"), "@invalid")
 		FT {
 			Config.logChannelID.let {
-				val messageAction = jda?.getTextChannelById(it)?.sendMessage(message)
+				val messageAction = jda?.getTextChannelById(it)?.sendMessage(sanitized)
 				if (Config.allowMentions == false) {
 					messageAction?.setAllowedMentions(emptySet())
 				}
@@ -321,7 +322,6 @@ object DiscordBotManager {
 			}
 		}
 	}
-
 	fun sendToDiscordConsole(message: String) {
 		logQueue.add(message)
 	}
