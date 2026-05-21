@@ -9,20 +9,19 @@ import net.ririfa.fabricord.Logger
 import net.ririfa.fabricord.translation.FabricordMessageKey
 
 object DiscordPlayerEventHandler {
-	fun handleMCMessage(player: ServerPlayerEntity, message: String) {
+	fun handleMCMessage(player: Boolean, message: String) {
 		FT {
 			when (Config.messageStyle) {
-				"modern" -> modernStyle(player, message)
 				"classic" -> classicStyle(player, message)
 				else -> classicStyle(player, message)
 			}
 		}
 	}
 
-	private fun classicStyle(player: ServerPlayerEntity, message: String) {
-		val mcId = player.name.string
-		val formattedMessage = "$mcId » $message"
-		DiscordBotManager.sendToDiscord(formattedMessage)
+	private fun classicStyle(player: Boolean, message: String) {
+        if (player) {
+            DiscordBotManager.sendToDiscord(message)
+        }
 	}
 
 	private fun modernStyle(player: ServerPlayerEntity, message: String) {

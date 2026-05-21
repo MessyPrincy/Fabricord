@@ -157,18 +157,31 @@ class Fabricord : DedicatedServerModInitializer {
 				}
 			}
 		})
-		ServerMessageEvents.CHAT_MESSAGE.register(ServerMessageEvents.ChatMessage { message, sender, params ->
-			if (DiscordBotManager.botIsInitialized) {
-				val uuid = sender.uuid
+        ServerMessageEvents.GAME_MESSAGE.register(ServerMessageEvents.GameMessage { server, message, overlay ->
+            if (!DiscordBotManager.botIsInitialized) return@GameMessage
 
-				//TODO: Also consider group chats -> [GroupManager]
-				// But probably controllable via Mixin.
-				if (uuid in localChatToggled) return@ChatMessage
+            // Ignore actionbar/system overlay messages
+            if (overlay) return@GameMessage
 
-				val content = message.content.string
-				handleMCMessage(sender, content)
-			}
-		})
+            val content = message.string
+
+            // Try to resolve the player from the formatted message
+            val player = server.playerManager.playerList.firstOrNull { player ->
+                content.contains(player.name.string)
+            } ?: return@GameMessage
+
+            val uuid = player.uuid
+
+            // Ignore local chat players
+            if (uuid in localChatToggled) return@GameMessage
+
+            val isplayer = content.contains("]") && content.contains("[") && content.contains(":")
+
+            // Remove Minecraft formatting codes
+            val cleanedContent = content.replace(Regex("§."), "")
+
+            handleMCMessage(isplayer, cleanedContent)
+        })
 	}
 
 	private fun registerLCCommand(dispatcher: CommandDispatcher<ServerCommandSource>) {
